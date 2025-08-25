@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحدي حفظ القرآن</title>
+    
+    <!-- استدعاء ملف الأنماط الرئيسي -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- استدعاء خطوط جوجل -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- إضافة مكتبة الرسوم البيانية Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- إضافة مكتبة الأيقونات Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+    <!-- شاشة البداية (Splash Screen ) -->
+    <div id="splash-screen" class="screen active">
+        <div class="container">
+            <h1>تحدي حفظ القرآن</h1>
+            <div class="loading-spinner"></div>
+            <p>جارٍ تحميل البيانات...</p>
+        </div>
+    </div>
+
+    <!-- شاشة تسجيل الدخول والمصادقة -->
+    <div id="login-screen" class="screen">
+        <div class="container">
+            <h2>أهلاً بك في تحدي حفظ القرآن</h2>
+            <p id="auth-form-title">الرجاء تسجيل الدخول للمتابعة</p>
+            <div id="auth-form">
+                <input type="text" id="username-input" placeholder="اكتب اسمك الذي سيظهر للجميع" autocomplete="name" style="display: none;">
+                <input type="email" id="email-input" placeholder="البريد الإلكتروني" autocomplete="email">
+                <input type="password" id="password-input" placeholder="كلمة المرور" autocomplete="current-password">
+                <p id="auth-error" class="error-message" style="display: none; color: red; margin-top: 10px;"></p>
+                <button id="auth-action-button" class="button-primary">تسجيل الدخول</button>
+            </div>
+            <p id="auth-toggle-message" style="margin-top: 20px;">ليس لديك حساب؟ <a href="#" id="toggle-to-signup">أنشئ حساباً جديداً</a></p>
+        </div>
+    </div>
+
+    <!-- الشاشة الرئيسية -->
+    <div id="main-screen" class="screen">
+        <div class="container">
+            <header class="main-header">
+                <h2 id="welcome-message"></h2>
+                <div id="user-stats"></div>
+            </header>
+
+            <main class="main-menu">
+                <button id="start-test-button" class="button-main"><i class="fas fa-play-circle"></i> ابدأ اختباراً جديداً</button>
+                <button id="start-review-button" class="button-primary"><i class="fas fa-brain"></i> ابدأ المراجعة الذكية</button>
+                <button id="store-button" class="button-secondary"><i class="fas fa-store"></i> المتجر</button>
+                <button id="profile-button" class="button-secondary"><i class="fas fa-user"></i> ملفي الشخصي</button>
+                <button id="hifz-tree-button" class="button-secondary"><i class="fas fa-tree"></i> شجرة الحفظ</button>
+                <button id="leaderboard-button" class="button-secondary"><i class="fas fa-trophy"></i> لوحة الصدارة</button>
+                <button id="plan-button" class="button-secondary"><i class="fas fa-calendar-alt"></i> خطتي للحفظ</button>
+                <button id="rings-button" class="button-secondary"><i class="fas fa-users"></i> الحلقات</button>
+                <button id="logout-button" class="button-secondary logout-btn"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
+            </main>
+        </div>
+    </div>
+
+    <!-- شاشة إعدادات الاختبار المخصص -->
+    <div id="custom-test-setup-screen" class="screen">
+        <div class="container">
+            <header class="screen-header">
+                <button class="back-button"><i class="fas fa-arrow-right"></i></button>
+                <h2>إعداد اختبار مخصص</h2>
+                <span></span>
+            </header>
+            
+            <form id="custom-test-setup-form">
+                <div class="setup-section">
+                    <h4><i class="fas fa-book-reader"></i> نطاق الحفظ</h4>
+                    <p>حدد الصفحات التي تريد الاختبار فيها. اتركها فارغة للاختبار في كل الصفحات المحفوظة.</p>
+                    <div class="page-range-inputs">
+                        <input type="number" id="test-start-page" name="test-start-page" placeholder="من صفحة" min="1" max="604">
+                        <input type="number" id="test-end-page" name="test-end-page" placeholder="إلى صفحة" min="1" max="604">
+                    </div>
+                </div>
+
+                <div class="setup-section">
+                    <h4><i class="fas fa-question-circle"></i> أنواع الأسئلة</h4>
+                    <p>اختر أنواع الأسئلة التي تريد التركيز عليها (اختر واحدة على الأقل).</p>
+                    <div id="test-question-types-container" class="checkbox-grid">
+                        <!-- سيتم ملء أنواع الأسئلة هنا بواسطة JS -->
+                    </div>
+                </div>
+
+                <div class="setup-section">
+                    <h4><i class="fas fa-list-ol"></i> طول الاختبار</h4>
+                    <select id="test-question-count" name="test-question-count">
+                        <option value="5">5 أسئلة (سريع)</option>
+                        <option value="10" selected>10 أسئلة (عادي)</option>
+                        <option value="15">15 سؤالاً (مكثف)</option>
+                    </select>
+                </div>
+
+                <button type="submit" id="start-custom-test-btn" class="button-primary" style="margin-top: 30px;">
+                    <i class="fas fa-play-circle"></i> ابدأ الاختبار المخصص
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- شاشة الاختبار -->
+    <div id="test-screen" class="screen">
+        <div class="container">
+            <header class="screen-header">
+                <button class="back-button"><i class="fas fa-arrow-right"></i></button>
+                <h3 id="question-title"></h3>
+                <span></span>
+            </header>
+            <div id="progress-container"><div id="progress-bar"></div></div>
+            <div id="question-container" class="question-box"></div>
+            <div id="options-container"></div>
+            <button id="submit-answer-button" class="button-primary" style="display: none;">إرسال الإجابة</button>
+            <button id="next-question-button" class="button-secondary" style="display: none;">السؤال التالي</button>
+        </div>
+    </div>
+
+    <!-- شاشة النتائج -->
+    <div id="results-screen" class="screen">
+        <div class="container">
+            <header class="screen-header">
+                <span></span>
+                <h2>نتائج الاختبار</h2>
+                <span></span>
+            </header>
+            <p id="results-summary"></p>
+            <p id="results-xp"></p>
+            <p id="results-diamonds"></p>
+            <div id="results-bonus-messages"></div>
+            <button id="back-to-main-button" class="button-primary"><i class="fas fa-home"></i> العودة إلى الرئيسية</button>
+        </div>
+    </div>
+
+    <!-- شاشة المتجر -->
+    <div id="store-screen" class="screen">
+        <div class="container">
+            <header class="screen-header">
+                <button class="back-button"><i class="fas fa-arrow-right"></i></button>
+                <h2>المتجر</h2>
+                <div id="store-diamonds-balance-container">رصيدك: <span id="store-diamonds-balance"></span> 💎</div>
+            </header>
+            <div id="store-items-container"></div>
+        </div>
+    </div>
+
+    <!-- شاشة الملف الشخصي -->
+    <div id="profile-screen" class="screen">
+        <div class="container">
+            <header class="screen-header">
+                <button class="back-button"><i class="fas fa-arrow-right"></i></button>
+                <h2>الملف الشخصي</h2>
+                <span></span>
+            </header>
+            <div id="profile-info">
+                <h3 id="profile-username"></h3>
+                <p id="profile-level-title"></p>
+                <p>نقاط الخبرة: <span id="profile-total-xp"></span> XP</p>
+                <p>الألماس: <span id="profile-diamonds"></span> 💎</p>
+            </div>
+            <hr>
+            <h3><i class="fas fa-chart-pie"></i> إحصائيات الأداء</h3>
+            <div id="stats-section" style="width: 100%; max-width: 600px; margin: auto;">
+                <h4>توزيع الإجابات</h4>
+                <div style="width: 70%; margin: auto; max-width: 250px;">
+                    <canvas id="answers-pie-chart"></canvas>
+                </div>
+                <p style="text-align: center;">الإجابات الصحيحة: <span id="stats-correct-answers"></span> | الإجابات الخاطئة: <span id="stats-wrong-answers"></span></p>
+                <hr style="margin: 20px 0;">
+                <h4>ملخص أداء الصفحات</h4>
+                <div id="pages-performance-summary" style="text-align: right;">
+                    <h5>⭐ أفضل 3 صفحات أداءً:</h5>
+                    <ul id="best-pages-list"></ul>
+                    <h5>⚠️ أضعف 3 صفحات أداءً:</h5>
+                    <ul id="worst-pages-list"></ul>
+                </div>
+            </div>
+            <hr>
+            <h4><i class="fas fa-gem"></i> ممتلكاتي</h4>
+            <div id="profile-owned-items-container">
+                <!-- سيتم عرض الثيمات والألقاب والإطارات هنا -->
+            </div>
+        </div>
+    </div>
+
+    <!-- شاشة شجرة الحفظ -->
+    <div id="hifz-tree-screen" class="screen">
+        <div class="container">
+            <header class="screen-header">
+                <button class="back-button"><i class="fas fa-arrow-right"></i></button>
+                <h2>شجرة الحفظ</h2>
+                <span></span>
+            </header>
+            <div class="hifz-legend">
+                <span class="legend-item"><div class="page-cell" style="background-color: rgba(0, 91, 65, 0.1);"></div> قليل</span>
+                <span class="legend-item"><div class="page-cell" style="background-color: rgba(0, 91, 65, 0.5);"></div> متوسط</span>
+                <span class="legend-item"><div class="page-cell" style="background-color: rgba(0, 91, 65, 1.0); color: white;"></div> كثير</span>
+                <span class="legend-item">تركيز المراجعة (خريطة حرارية)</span>
+            </div>
+            <div id="hifz-tree-container-main"></div>
+        </div>
+    </div>
+
+    <!-- شاشة لوحة الصدارة -->
+    <div id="leaderboard-screen" class="screen">
+        <div class="container">
+            <header class="screen-header">
+                <button class="back-button"><i class="fas fa-arrow-right"></i></button>
+                <h2>لوحة الصدارة</h2>
+                <span></span>
+            </header>
+            <div id="leaderboard-filters" style="margin-bottom: 20px; display: flex; justify-content: center; gap: 10px;">
+                <button id="leaderboard-all-time-btn" class="button-secondary active">كل الأوقات</button>
+                <button id="leaderboard-monthly-btn" class="button-secondary">هذا الشهر</button>
+                <button id="leaderboard-weekly-btn" class="button-secondary">هذا الأسبوع</button>
+            </div>
+            <div id="leaderboard-container"><div class="loading-spinner"></div></div>
+        </div>
+    </div>
+
+    <!-- شاشة خطة الحفظ (مبسطة) -->
+    <div id="plan-screen" class="screen">
+        <div class="container">
+            <header class="screen-header">
+                <button class="back-button"><i class="fas fa-arrow-right"></i></button>
+                <h2>خطتي للحفظ</h2>
+                <span></span>
+            </header>
+            <p>ميزة خطط الحفظ قيد التطوير.</p>
+        </div>
+    </div>
+
+    <!-- شاشة الحلقات الرئيسية -->
+    <div id="rings-screen" class="screen">
+        <div class="container">
+            <header class="screen-header">
+                <button class="back-button"><i class="fas fa-arrow-right"></i></button>
+                <h2>الحلقات الدراسية</h2>
+                <span></span>
+            </header>
+            <div id="my-rings-container">
+                <h4>حلقاتي</h4>
+                <div id="my-rings-list"></div>
+            </div>
+            <hr>
+            <div id="public-rings-container">
+                <h4>الانضمام إلى حلقة</h4>
+                <div id="public-rings-list"></div>
+            </div>
+            <button id="create-ring-btn" class="button-primary" style="margin-top: 20px;"><i class="fas fa-plus-circle"></i> إنشاء حلقة جديدة</button>
+        </div>
+    </div>
+
+    <!-- شاشة تفاصيل الحلقة -->
+    <div id="ring-details-screen" class="screen">
+        <div class="container">
+            <header class="screen-header">
+                <button class="back-button" id="back-to-rings-list-btn"><i class="fas fa-arrow-right"></i></button>
+                <h2 id="ring-details-name"></h2>
+                <button id="ring-settings-btn" class="button-icon" style="display: none;"><i class="fas fa-cog"></i></button>
+            </header>
+            <div class="ring-details-tabs">
+                <button class="ring-tab-button active" data-ring-tab="ring-challenges">التحديات والمهام</button>
+                <button class="ring-tab-button" data-ring-tab="ring-leaderboard">لوحة الصدارة</button>
+                <button class="ring-tab-button" data-ring-tab="ring-chat">المحادثة</button>
+            </div>
+            <div class="ring-tab-content active" id="ring-challenges">
+                <p>ميزة التحديات قيد التطوير.</p>
+            </div>
+            <div class="ring-tab-content" id="ring-leaderboard"></div>
+            <div class="ring-tab-content" id="ring-chat">
+                <div id="ring-chat-messages"></div>
+                <form id="ring-chat-form">
+                    <input type="text" id="ring-chat-input" placeholder="اكتب رسالتك..." required>
+                    <button type="submit" class="button-primary"><i class="fas fa-paper-plane"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- شاشة لوحة تحكم المدير -->
+    <div id="admin-panel-screen" class="screen">
+        <div class="container">
+            <header class="screen-header">
+                <button class="back-button" id="back-to-admin-panel-btn"><i class="fas fa-arrow-right"></i></button>
+                <h2><i class="fas fa-user-shield"></i> لوحة التحكم</h2>
+                <span></span>
+            </header>
+            <div class="admin-tabs">
+                <button class="admin-tab-button" data-tab="admin-user-management">إدارة المستخدمين</button>
+                <button class="admin-tab-button" data-tab="admin-store-management">إدارة المتجر</button>
+            </div>
+            <div class="admin-tab-content" id="admin-user-management"></div>
+            <div class="admin-tab-content" id="admin-store-management"></div>
+        </div>
+    </div>
+
+    <!-- شاشة تفاصيل المستخدم (للأدمن) -->
+    <div id="admin-user-details-screen" class="screen">
+        <div class="container">
+            <header class="screen-header">
+                <button class="back-button" id="back-to-admin-panel-btn"><i class="fas fa-arrow-right"></i></button>
+                <h2 id="admin-user-details-title">تفاصيل المستخدم</h2>
+                <span></span>
+            </header>
+            <div id="admin-user-details-content"><div class="loading-spinner"></div></div>
+        </div>
+    </div>
+
+    <!-- النافذة المنبثقة العامة (Modal) -->
+    <div id="custom-modal" class="modal">
+        <div class="modal-content">
+            <span id="modal-close-button" class="close-button">&times;</span>
+            <h3 id="modal-title"></h3>
+            <div id="modal-message" style="white-space: pre-wrap;"></div>
+        </div>
+    </div>
+
+    <!-- استدعاء ملف الجافاسكريبت الرئيسي كوحدة (Module) -->
+    <!-- هذا السطر هو أهم تغيير، حيث يقوم بتحميل وتشغيل التطبيق بالكامل -->
+    <script type="module" src="main.js"></script>
+
+</body>
+</html>
