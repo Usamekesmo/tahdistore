@@ -113,9 +113,6 @@ console.log("Password:", password);
 console.log("Username (in signup mode):", username);
 // ---------------------------------
 
-try {
-    let response;
-    if (isSignupMode) {
 // ... بقية الكود ...
         let response;
         if (isSignupMode) {
