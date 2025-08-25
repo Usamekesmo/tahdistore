@@ -103,17 +103,14 @@ async function handleAuthAction() {
     UI.authActionButton.textContent = 'جارٍ التنفيذ...';
     UI.authError.style.display = 'none';
 
+    // --- التشخيص: طباعة البيانات قبل محاولة الإرسال ---
+    console.log("البيانات التي سيتم إرسالها إلى Supabase:");
+    console.log("Email:", email);
+    console.log("Password:", password);
+    console.log("Username (in signup mode):", username);
+    // ----------------------------------------------------
+
     try {
-        // ... داخل دالة handleAuthAction ...
-
-// --- أضف هذا الجزء للتشخيص ---
-console.log("البيانات التي سيتم إرسالها إلى Supabase:");
-console.log("Email:", email);
-console.log("Password:", password);
-console.log("Username (in signup mode):", username);
-// ---------------------------------
-
-// ... بقية الكود ...
         let response;
         if (isSignupMode) {
             // --- وضع إنشاء حساب جديد ---
@@ -121,8 +118,6 @@ console.log("Username (in signup mode):", username);
                 email: email,
                 password: password,
                 options: {
-                    // نخزن اسم المستخدم في البيانات الوصفية ليتم استخدامه
-                    // عند إنشاء الملف الشخصي في قاعدة البيانات.
                     data: {
                         username: username
                     }
@@ -136,27 +131,21 @@ console.log("Username (in signup mode):", username);
             });
         }
 
-        // التحقق من وجود خطأ في الاستجابة
         if (response.error) {
             throw response.error;
         }
 
-        // ملاحظة: onAuthStateChange في main.js سيتولى بقية العملية
-        // مثل إنشاء الملف الشخصي أو الانتقال للشاشة الرئيسية.
-
     } catch (error) {
         UI.authError.textContent = translateAuthError(error);
         UI.authError.style.display = 'block';
+        // طباعة الخطأ الفعلي في الكونسول لمزيد من التشخيص
+        console.error("Authentication Error:", error); 
     } finally {
         UI.authActionButton.disabled = false;
-        // إعادة النص الأصلي للزر بناءً على الوضع الحالي
         UI.authActionButton.textContent = isSignupMode ? 'إنشاء حساب' : 'تسجيل الدخول';
     }
 }
 
-/**
- * إعداد واجهة تسجيل الدخول/الإنشاء لأول مرة وربط الأحداث.
- */
 export function setupAuthScreen() {
     // التأكد من عدم إضافة المستمع أكثر من مرة
     if (!UI.authActionButton.dataset.listener) {
