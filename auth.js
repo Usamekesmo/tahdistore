@@ -83,6 +83,10 @@ function toggleAuthMode(e) {
 /**
  * التعامل مع إجراء المصادقة (تسجيل الدخول أو إنشاء حساب).
  */
+// ملف auth.js
+
+// ... (بقية الدوال مثل translateAuthError, updateAuthFormUI, etc.)
+
 async function handleAuthAction() {
     const email = UI.emailInput.value.trim();
     const password = UI.passwordInput.value.trim();
