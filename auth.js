@@ -104,6 +104,19 @@ async function handleAuthAction() {
     UI.authError.style.display = 'none';
 
     try {
+        // ... داخل دالة handleAuthAction ...
+
+// --- أضف هذا الجزء للتشخيص ---
+console.log("البيانات التي سيتم إرسالها إلى Supabase:");
+console.log("Email:", email);
+console.log("Password:", password);
+console.log("Username (in signup mode):", username);
+// ---------------------------------
+
+try {
+    let response;
+    if (isSignupMode) {
+// ... بقية الكود ...
         let response;
         if (isSignupMode) {
             // --- وضع إنشاء حساب جديد ---
